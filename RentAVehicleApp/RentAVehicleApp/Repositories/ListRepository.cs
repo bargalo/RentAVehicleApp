@@ -30,10 +30,11 @@ namespace RentAVehicleApp.Repositories
 
         public void Save()
         {
-            //foreach (var item in _items)
-            //{
-            //    Console.WriteLine(item);
-            //}
+        }
+
+        public IEnumerable<T> GetAllFromJson()
+        {
+            throw new NotImplementedException();
         }
     }
 }

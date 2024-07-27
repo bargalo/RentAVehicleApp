@@ -5,5 +5,6 @@ namespace RentAVehicleApp.Repositories;
 public interface IReadRepository<out T> where T : class, IEntity
 {
     IEnumerable<T> GetAll();
-    T GetById(int id);
+    //IEnumerable<T> GetAllFromJson();
+    T? GetById(int id);
 }
