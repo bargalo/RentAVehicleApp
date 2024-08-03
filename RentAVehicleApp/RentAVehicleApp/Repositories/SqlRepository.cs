@@ -16,7 +16,7 @@ public class SqlRepository<T> : IRepository<T> where T : class, IEntity, new()
         _dbContext = dbContext;
         _dbSet = _dbContext.Set<T>();
     }
-    
+
     public event EventHandler<T>? ItemAdded;
     public event EventHandler<T>? ItemRemoved;
 

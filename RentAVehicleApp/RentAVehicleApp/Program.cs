@@ -3,66 +3,57 @@ using RentAVehicleApp.Entities;
 using RentAVehicleApp.Entities.Extensions;
 using RentAVehicleApp.Repositories;
 using RentAVehicleApp.Repositories.Extensions;
+using RentAVehicleApp.UserInterface;
 using System.Reflection;
 using System.Security.AccessControl;
 
 var auditFile = new AuditFile("plikAudytowy.txt");
-var jsonFile = new EntitiesInFile("dataInJson.json");
 
-var rentierRepository = new SqlRepository<Rentier>(new RentAVehicleAppDbContext());
+var rentierRepository = new ListRepository<Rentier>();
+var userInterface = new UserInterface(rentierRepository);
 
-LoadDataFromJson(jsonFile, rentierRepository);
-
+LoadDataFromJson(rentierRepository);
 rentierRepository.ItemAdded += (sender, e) => RentierAdded(sender, e, auditFile);
 rentierRepository.ItemRemoved += (sender, e) => RentierRemoved(sender, e, auditFile);
 
-static void LoadDataFromJson(EntitiesInFile jsonFile, SqlRepository<Rentier> rentierRepository)
+userInterface.MainMenu();
+
+static void LoadDataFromJson(ListRepository<Rentier> rentierRepository)
 {
-    var dataFromJson = jsonFile.LoadFromJson<Rentier>();
+    var dataFromJson = rentierRepository.LoadFromJson<Rentier>();
     if (dataFromJson != null)
     {
-        rentierRepository.Add(dataFromJson);
+        rentierRepository.AddFromJson(dataFromJson);
     }
 }
 
 static void RentierRemoved(object? sender, Rentier e, AuditFile auditFile)
 {
     auditFile.AddInfo_HasBeenRemoved(e);
-    Console.WriteLine($"Rentier {e.Name} with Id:{e.Id} from {sender.GetType().Name} has been removed!");
+    Console.WriteLine($"Rentier {e.Name} {e.Surname} with Id:{e.Id} from {sender.GetType().Name} has been removed!\n");
 }
 
 static void RentierAdded(object? sender, Rentier e, AuditFile auditFile)
 {
     auditFile.AddInfo_HasBeenAdded(e);
-    Console.WriteLine($"Rentier {e.Name} with Id:{e.Id} from {sender.GetType().Name} has been added!");
+    Console.WriteLine($"Rentier {e.Name} {e.Surname} with Id:{e.Id} from {sender.GetType().Name} has been added!\n");
 }
 
-AddRentiers(rentierRepository, jsonFile);
-WriteAllToConsole(rentierRepository);
+//AddRentiers(rentierRepository);
 
-static void AddRentiers(IRepository<Rentier> rentierRepository, EntitiesInFile jsonFile)
-{
-    var rentiers = new[]
-    {
-        new Rentier {Name = "Bartek"},
-        new Rentier {Name = "Piotr"},
-        new Rentier {Name = "Zuzia"}
-    };
+//static void AddRentiers(IRepository<Rentier> rentierRepository)
+//{
+//    var rentiers = new[]
+//    {
+//        new Rentier {Name = "Bartek"},
+//        new Rentier {Name = "Piotr"},
+//        new Rentier {Name = "Zuzia"}
+//    };
 
-    rentierRepository.AddBatch(rentiers, jsonFile);
-}
+//    rentierRepository.AddBatch(rentiers);
+//}
 
 
-static void WriteAllToConsole(IReadRepository<IEntity> repository)
-{
-    var items = repository.GetAll();
-    foreach (var item in items)
-    {
-        Console.WriteLine(item);
-    }
-    //var copied = items[0].Copy();
-    //Console.WriteLine(copied);
-}
 
 
 
